@@ -10,10 +10,13 @@ import dagger.hilt.components.SingletonComponent
 import edu.ucne.registroocupacion.data.local.AppDatabase
 import edu.ucne.registroocupacion.data.local.dao.EmpleadoDao
 import edu.ucne.registroocupacion.data.local.dao.OcupacionDao
+import edu.ucne.registroocupacion.data.local.dao.TicketDao
 import edu.ucne.registroocupacion.data.repository.EmpleadoRepositoryImpl
 import edu.ucne.registroocupacion.data.repository.OcupacionRepositoryImpl
+import edu.ucne.registroocupacion.data.repository.TicketRepositoryImpl
 import edu.ucne.registroocupacion.domain.repository.EmpleadoRepository
 import edu.ucne.registroocupacion.domain.repository.OcupacionRepository
+import edu.ucne.registroocupacion.domain.repository.TicketRepository
 import javax.inject.Singleton
 
 @Module
@@ -40,6 +43,11 @@ object AppModule {
     }
 
     @Provides
+    fun provideTicketDao(appDatabase: AppDatabase): TicketDao {
+        return appDatabase.ticketDao()
+    }
+
+    @Provides
     fun provideOcupacionRepository(ocupacionDao: OcupacionDao): OcupacionRepository {
         return OcupacionRepositoryImpl(ocupacionDao)
     }
@@ -47,5 +55,10 @@ object AppModule {
     @Provides
     fun provideEmpleadoRepository(empleadoDao: EmpleadoDao): EmpleadoRepository {
         return EmpleadoRepositoryImpl(empleadoDao)
+    }
+
+    @Provides
+    fun provideTicketRepository(ticketDao: TicketDao, empleadoDao: EmpleadoDao): TicketRepository {
+        return TicketRepositoryImpl(ticketDao, empleadoDao)
     }
 }
