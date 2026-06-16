@@ -10,39 +10,37 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import edu.ucne.registroocupacion.domain.model.Ocupacion
+import edu.ucne.registroocupacion.domain.model.Empleado
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ListOcupacionScreen(
+fun ListEmpleadoScreen(
     windowSizeClass: WindowSizeClass,
-    viewModel: ListOcupacionViewModel = hiltViewModel(),
+    viewModel: ListEmpleadoViewModel = hiltViewModel(),
     onNavigateToCreate: () -> Unit,
     onNavigateToEdit: (Int) -> Unit
 ) {
-    val ocupaciones by viewModel.ocupaciones.collectAsStateWithLifecycle()
+    val empleados by viewModel.empleados.collectAsState()
     val isCompactWidth = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Lista de Ocupaciones") }
-            )
+            TopAppBar(title = { Text("Lista de Empleados") })
         },
         floatingActionButton = {
             FloatingActionButton(onClick = onNavigateToCreate) {
-                Icon(Icons.Default.Add, contentDescription = "Crear")
+                Icon(Icons.Default.Add, contentDescription = "Nuevo Empleado")
             }
         }
     ) { innerPadding ->
@@ -52,11 +50,11 @@ fun ListOcupacionScreen(
                     .padding(innerPadding)
                     .fillMaxSize()
             ) {
-                items(ocupaciones) { ocupacion ->
-                    OcupacionItem(
-                        ocupacion = ocupacion,
-                        onClick = { onNavigateToEdit(ocupacion.ocupacionId) },
-                        onDelete = { viewModel.delete(ocupacion) }
+                items(empleados) { empleado ->
+                    EmpleadoItem(
+                        empleado = empleado,
+                        onClick = { onNavigateToEdit(empleado.empleadoId) },
+                        onDelete = { viewModel.delete(empleado) }
                     )
                     HorizontalDivider()
                 }
@@ -71,17 +69,17 @@ fun ListOcupacionScreen(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                items(ocupaciones) { ocupacion ->
+                items(empleados) { empleado ->
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { onNavigateToEdit(ocupacion.ocupacionId) },
+                            .clickable { onNavigateToEdit(empleado.empleadoId) },
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
-                        OcupacionItem(
-                            ocupacion = ocupacion,
-                            onClick = { onNavigateToEdit(ocupacion.ocupacionId) },
-                            onDelete = { viewModel.delete(ocupacion) }
+                        EmpleadoItem(
+                            empleado = empleado,
+                            onClick = { onNavigateToEdit(empleado.empleadoId) },
+                            onDelete = { viewModel.delete(empleado) }
                         )
                     }
                 }
@@ -91,8 +89,8 @@ fun ListOcupacionScreen(
 }
 
 @Composable
-fun OcupacionItem(
-    ocupacion: Ocupacion,
+fun EmpleadoItem(
+    empleado: Empleado,
     onClick: () -> Unit,
     onDelete: () -> Unit
 ) {
@@ -101,21 +99,16 @@ fun OcupacionItem(
             .fillMaxWidth()
             .clickable(onClick = onClick)
             .padding(16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        Icon(Icons.Default.Person, contentDescription = null)
+        Spacer(modifier = Modifier.width(16.dp))
         Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = "ID: ${ocupacion.ocupacionId} - ${ocupacion.descripcion}",
-                style = MaterialTheme.typography.titleMedium
-            )
-            Text(
-                text = "Sueldo: $${ocupacion.sueldo}",
-                color = MaterialTheme.colorScheme.primary
-            )
+            Text(empleado.nombres, style = MaterialTheme.typography.titleMedium)
+            Text("Sueldo: ${empleado.sueldo}", style = MaterialTheme.typography.bodyMedium)
         }
         IconButton(onClick = onDelete) {
-            Icon(Icons.Default.Delete, contentDescription = "Eliminar", tint = Color.Red)
+            Icon(Icons.Default.Delete, contentDescription = "Eliminar", tint = MaterialTheme.colorScheme.error)
         }
     }
 }
